@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FaceFusion Educativo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: linear-gradient(180deg, #fdfbff 0%, #f3f6ff 100%);
+      color: #1f2937;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 32px;
+      color: #1f2937;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    h1 span {
+      color: #8b5cf6;
+    }
+
+    .upload-box {
+      width: 380px;
+      height: 260px;
+      border: 2px dashed #c4b5fd;
+      background: white;
+      border-radius: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.08);
+    }
+
+    .upload-box:hover {
+      background: #faf7ff;
+      border-color: #8b5cf6;
+      transform: translateY(-2px);
+    }    
+    .upload-box.has-image { border-style: solid; border-color: #4caf50; }
+    .upload-icon { font-size: 40px; }
+    .upload-box p {font-size: 18px;color: #374151;font-weight: 600;}    
+    .upload-box span {font-size: 13px;color: #9ca3af;}
+
+    #preview-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 14px;
+      display: none;
+      position: absolute;
+      top: 0; left: 0;
+    }
+
+    input[type="file"] { display: none; }
+
+    .btn-procesar {
+      background: linear-gradient(135deg, #8b5cf6, #a78bfa);      color: white;
+      border: none;
+      padding: 14px 40px;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+      display: none;
+    }
+
+    .btn-procesar:hover {transform: translateY(-1px);opacity: 0.95;}    
+    .btn-procesar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .estado {
+      font-size: 14px;
+      color: #888;
+      text-align: center;
+      display: none;
+      max-width: 380px;
+      line-height: 1.6;
+    }
+
+    .progreso {
+      width: 380px;
+      height: 6px;
+      background: #e5e7eb;  
+      border-radius: 6px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .progreso-barra {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #7c6aff, #a090ff);
+      border-radius: 6px;
+      animation: cargar 90s linear forwards;
+    }
+
+    @keyframes cargar { to { width: 95%; } }
+
+    .resultado {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .resultado video {
+      width: 380px;
+      border-radius: 16px;
+      background: #000;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    }
+
+    .btn-descargar {
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 12px;
+      font-size: 15px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-descargar:hover { background: #43a047; }
+
+    .btn-nuevo {
+      background: transparent;
+      color: #7c6aff;
+      border: 1px solid #7c6aff;
+      padding: 10px 28px;
+      border-radius: 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Sé parte de la <span>historia</span> 🎬</h1>
+  <p style="color:#666;font-size:13px;text-align:center;">Sube tu foto y aparecerás en el video educativo</p>
+
+  <label class="upload-box" for="foto-input" id="upload-box">
+    <img id="preview-img" alt="preview">
+    <div class="upload-icon" id="upload-icon">📷</div>
+    <p id="upload-text">Sube tu foto aquí</p>
+    <span id="upload-sub">JPG o PNG — cara de frente</span>
+  </label>
+
+  <input type="file" id="foto-input" accept="image/*">
+
+  <button class="btn-procesar" id="btn-procesar" onclick="procesar()">
+    ✨ Generar mi video
+  </button>
+
+  <div class="progreso" id="progreso">
+    <div class="progreso-barra"></div>
+  </div>
+
+  <p class="estado" id="estado">
+    ⏳ Procesando tu video...<br>
+    <small>Esto puede tardar varios minutos, no cierres esta página.</small>
+  </p>
+
+  <div class="resultado" id="resultado">
+    <video id="video-resultado" controls></video>
+    <a class="btn-descargar" id="btn-descargar" download="mi_video.mp4">⬇ Descargar video</a>
+    <button class="btn-nuevo" onclick="reiniciar()">Intentar con otra foto</button>
+  </div>
+
+  <script>
+    let archivoFoto = null;
+
+    document.getElementById('foto-input').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      archivoFoto = file;
+
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const img = document.getElementById('preview-img');
+        img.src = ev.target.result;
+        img.style.display = 'block';
+        document.getElementById('upload-icon').style.display = 'none';
+        document.getElementById('upload-text').style.display = 'none';
+        document.getElementById('upload-sub').style.display = 'none';
+        document.getElementById('upload-box').classList.add('has-image');
+        document.getElementById('btn-procesar').style.display = 'inline-block';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    async function procesar() {
+      if (!archivoFoto) return;
+
+      const btn = document.getElementById('btn-procesar');
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+
+      document.getElementById('estado').style.display = 'block';
+      document.getElementById('progreso').style.display = 'block';
+
+      const formData = new FormData();
+      formData.append('foto', archivoFoto);
+
+      try {
+        const res = await fetch('/procesar', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (data.success) {
+          const videoUrl = `/resultado/${data.video_id}`;
+          const videoEl = document.getElementById('video-resultado');
+          const descarga = document.getElementById('btn-descargar');
+
+          videoEl.src = videoUrl;
+          descarga.href = videoUrl;
+
+          document.getElementById('estado').style.display = 'none';
+          document.getElementById('progreso').style.display = 'none';
+          document.getElementById('btn-procesar').style.display = 'none';
+          document.getElementById('resultado').style.display = 'flex';
+        } else {
+          alert('Error: ' + (data.error || 'Algo salió mal'));
+          btn.disabled = false;
+          btn.textContent = '✨ Generar mi video';
+        }
+      } catch (err) {
+        alert('Error de conexión con el servidor');
+        btn.disabled = false;
+        btn.textContent = '✨ Generar mi video';
+      }
+    }
+
+    function reiniciar() {
+      archivoFoto = null;
+      document.getElementById('preview-img').style.display = 'none';
+      document.getElementById('upload-icon').style.display = 'block';
+      document.getElementById('upload-text').style.display = 'block';
+      document.getElementById('upload-sub').style.display = 'block';
+      document.getElementById('upload-box').classList.remove('has-image');
+      document.getElementById('btn-procesar').style.display = 'none';
+      document.getElementById('btn-procesar').disabled = false;
+      document.getElementById('btn-procesar').textContent = '✨ Generar mi video';
+      document.getElementById('resultado').style.display = 'none';
+      document.getElementById('estado').style.display = 'none';
+      document.getElementById('progreso').style.display = 'none';
+      document.getElementById('foto-input').value = '';
+    }
+  </script>
+
+</body>
+</html>
