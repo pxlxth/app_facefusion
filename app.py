@@ -2,6 +2,7 @@ import os
 import uuid
 import subprocess
 from flask import Flask, request, jsonify, send_from_directory, send_file
+from flask import render_template
 
 app = Flask(__name__)
 
@@ -16,7 +17,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 @app.route("/")
 def index():
-    return send_from_directory(BASE_DIR, "index.html")
+    return render_template("index.html")
 
 @app.route("/procesar", methods=["POST"])
 def procesar():
