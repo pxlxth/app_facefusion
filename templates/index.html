@@ -54,6 +54,8 @@
       align-items:stretch;
       justify-content:center;
       transition:0.4s ease;
+      align-items: stretch; 
+
     }
 
     .sidebar{
@@ -256,8 +258,13 @@
 
       transition:0.4s ease;
     }
-    .video-base-state{
-      position:relative;
+    .video-base-state {
+      position: relative;
+      flex: 1;          
+      display: flex;   
+      flex-direction: column; 
+      gap: 8px;
+
     }
     .video-base-state::after{
       content:'';
@@ -291,7 +298,6 @@
       border-radius:14px;
       cursor:pointer;
     }
-    
 
     @media(max-width:980px){
 
@@ -328,20 +334,39 @@
     gap:28px;
   }
 
-  .left-panel{
-    display:flex;
-    flex-direction:column;
-    gap:28px;
+  .left-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
   }
 
-  .right-panel{
-    background:white;
-    border-radius:32px;
-    padding:34px;
-    min-height:640px;
-    box-shadow:0 15px 40px rgba(0,0,0,0.06);
-    position:relative;
-    overflow:hidden;
+  .right-panel {
+    background: white;
+    border-radius: 32px;
+    padding: 34px;
+    min-height: 640px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+    position: relative;
+    overflow: hidden; 
+    height: 100%;
+  }
+  .panel-bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 32px;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .intro-panel,
+  .flashcards-panel,
+  .resultado-panel {
+    position: relative;
+    z-index: 1;
   }
 
   .video-base-state,
@@ -385,25 +410,73 @@
     width:100%;
     border-radius:28px;
     margin-top:12px;
+    flex: 1;          
+    object-fit: cover; 
   }
 
-  .flashcards-panel{
-    height:100%;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    gap:24px;
+  .flashcards-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  position: relative;
+  z-index: 1;
+}
+  
+  .flashcard.exit{
+    opacity:0;
+    transform:translateX(120%) rotate(8deg);
   }
 
-  .flashcard{
-    width:100%;
-    max-width:560px;
-    background:#faf7ff;
-    border:1px solid #e9d5ff;
-    border-radius:28px;
-    padding:40px;
-    text-align:center;
+  .flashcard.enter{
+    opacity:0;
+    transform:translateX(60px) scale(0.96);
+  }
+
+  .flashcard-stack {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    height: 340px;
+  }
+
+
+  .flashcard {
+    position: absolute;
+    inset: 0;
+    background: #f3f0ff;
+    border: 1px solid #ddd6fe;
+    border-radius: 28px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(109, 40, 217, 0.12), 0 2px 8px rgba(109, 40, 217, 0.08);
+  }
+
+  .card-front {
+    z-index: 2;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+  }
+
+  .card-back {
+    z-index: 1;
+    transform: scale(0.93) translateY(12px);
+  }
+
+  .card-front.slide-out {
+    transform: translateX(110%) rotate(7deg);
+    opacity: 0;
+  }
+
+  .card-back.rise-up {
+    transform: scale(1) translateY(0px);
+    opacity: 1;
+    z-index: 3;
+  }
+  
+  .card-back.show{
+    opacity:0.92;
   }
 
   .flashcard-number{
@@ -455,7 +528,15 @@
     flex-direction:column;
     gap:12px;
   }
+  .slide-out{
+  transform:
+    translateX(120%)
+    rotate(8deg);
 
+  opacity:0;
+
+  z-index:3;
+}
   .flashcard-mini{
     background:white;
     border:1px solid #ede9fe;
@@ -496,17 +577,10 @@
     </p>
   </div>
 <div class="workspace" id="workspace">
-
-  <!-- IZQUIERDA -->
-  <div class="left-panel">
-
-    <!-- SUBIR FOTO -->
+   <div class="left-panel">
     <div class="upload-state" id="upload-state">
-
       <label class="upload-box" for="foto-input" id="upload-box">
-
         <img id="preview-img" alt="preview">
-
         <div class="upload-icon" id="upload-icon">
           📷
         </div>
@@ -520,21 +594,13 @@
         </span>
 
       </label>
-
       <input type="file" id="foto-input" accept="image/*">
 
       <button class="btn-procesar" id="btn-procesar" onclick="procesar()">
         ✨ Generar experiencia
       </button>
-
     </div>
-
-    <!-- VIDEO EDUCATIVO -->
     <div class="video-base-state" id="video-base-state">
-
-      <div class="panel-label">
-        Video educativo
-      </div>
 
       <video 
         id="video-original"
@@ -559,17 +625,16 @@
     <button class="btn-ver-video" id="btn-ver-video" onclick="mostrarResultado()">
       🎬 Ver mi video
     </button>
-    <!-- FLASHCARDS MINI -->
     <div class="mini-flashcards" id="mini-flashcards">
-      
     </div>
-
   </div>
 
-  <!-- DERECHA -->
   <div class="right-panel">
-
-    <!-- INTRO -->
+<img 
+    src="/static/flashcard_bg.svg" 
+    class="panel-bg-img" 
+    aria-hidden="true"
+  >
     <div class="intro-panel" id="intro-panel">
 
       <h2>
@@ -582,30 +647,42 @@
 
     </div>
 
-    <!-- FLASHCARDS -->
-    <div class="flashcards-panel" id="flashcards-panel">
+<div class="flashcards-panel" id="flashcards-panel">
 
-      <div class="flashcard" id="flashcard-content">
+  <div class="flashcard-stack">
 
-        <div class="flashcard-number">
-          Flashcards
-        </div>
+    <div
+      id="flashcard-back"
+      class="flashcard card-back">
+    </div>
 
-        <h3>
-          Aprende mientras generamos tu video
-        </h3>
+    <!-- CARTA FRONTAL -->
+    <div
+      id="flashcard-front"
+      class="flashcard card-front">
 
-        <p>
-          Presiona “Siguiente” para conocer un poco mas de la vida de nuestro personaje.
-        </p>
-
+      <div class="flashcard-number">
+        Flashcards
       </div>
 
-      <button class="btn-next" onclick="siguienteFlashcard()">
-        Siguiente →
-      </button>
+      <h3>
+        Aprende mientras generamos tu video
+      </h3>
+
+      <p>
+        Presiona “Siguiente” para conocer un poco más de la vida de nuestro personaje.
+      </p>
 
     </div>
+
+  </div>
+
+  <button class="btn-next" onclick="siguienteFlashcard()">
+    Siguiente →
+  </button>
+
+</div>
+
 
     <div class="resultado-panel" id="resultado-panel">
 
@@ -624,6 +701,8 @@
       </div>
 
     </div>
+    
+   
 
   </div>
 
@@ -709,7 +788,7 @@ async function procesar(){
 
       videoPreview.currentTime = 0;
       videoPreview.controls = false;
-videoPreview.muted = true;
+      videoPreview.muted = true;
 
       descarga.href = videoUrl;
 
@@ -754,12 +833,19 @@ videoPreview.muted = true;
 }
 function mostrarResultado(){
 
-  //document.getElementById('flashcards-panel').style.display = 'none';
+  // ocultar preview izquierdo
+  document.getElementById('video-base-state').style.display = 'none';
 
-  document.getElementById('resultado-panel').style.display = 'flex';
-
+  // ocultar boton
   document.getElementById('btn-ver-video').style.display = 'none';
 
+  // ocultar flashcards grandes
+  document.getElementById('flashcards-panel').style.display = 'none';
+
+  // mostrar video final a la derecha
+  document.getElementById('resultado-panel').style.display = 'flex';
+
+  // mostrar mini flashcards a la izquierda
   document.getElementById('mini-flashcards').style.display = 'flex';
 }
 const flashcards = [
@@ -777,26 +863,39 @@ const flashcards = [
   }
 ];
 
-let flashcardIndex = 0;
+let flashcardIndex = -1;
 
-function siguienteFlashcard(){
+function siguienteFlashcard() {
+  const front = document.getElementById('flashcard-front');
+  const back  = document.getElementById('flashcard-back');
 
-  document.getElementById('flashcard-content').innerHTML = `
-    <div class="flashcard-number">
-      Flashcard ${flashcardIndex + 1}/${flashcards.length}
-    </div>
+  let nextIndex = flashcardIndex + 1;
+  if (nextIndex >= flashcards.length) nextIndex = 0;
 
-    <h3>${flashcards[flashcardIndex].title}</h3>
-
-    <p>${flashcards[flashcardIndex].text}</p>
+  // Prepara contenido en la trasera (invisible, no se anima)
+  back.innerHTML = `
+    <div class="flashcard-number">Flashcard ${nextIndex + 1}/${flashcards.length}</div>
+    <h3>${flashcards[nextIndex].title}</h3>
+    <p>${flashcards[nextIndex].text}</p>
   `;
-  flashcardIndex++;
 
-  if(flashcardIndex >= flashcards.length){
-    flashcardIndex = 0;
-  }
+  // 1. La frontal sale volando (con transición)
+  front.classList.add('slide-out');
+
+setTimeout(() => {
+    front.style.transition = 'none';
+    front.style.transform = 'scale(1) translateY(0)';  // ← esta línea
+    front.innerHTML = back.innerHTML;
+    front.classList.remove('slide-out');
+
+    requestAnimationFrame(() => {
+      front.style.transition = '';
+      front.style.transform = '';
+    });
+
+    flashcardIndex = nextIndex;
+  }, 420);
 }
-
 function reiniciar(){
 
   archivoFoto = null;
