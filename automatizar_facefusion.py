@@ -54,3 +54,9 @@ print("Procesando...")
 time.sleep(120)
 
 print("Terminado")
+if __name__ == "__main__":
+    app.run(
+        debug=True,
+        host="0.0.0.0",
+        port=5000
+    )
