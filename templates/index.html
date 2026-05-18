@@ -228,10 +228,18 @@
 </div>
   </div>
  <button
+  id="btn-next"
   class="btn-next btn-next-right"
   onclick="siguienteFlashcard()"
 >
   →
+</button>
+<button
+  id="btn-prev"
+  class="btn-next btn-prev-left"
+  onclick="anteriorFlashcard()"
+>
+  ←
 </button>
 </div>
 <div
@@ -245,6 +253,20 @@
       alt="Infographic"
       class="infographic-img"
     >
+    <div class="audio-player-wrap">
+
+  <audio
+    id="infographic-audio"
+    controls
+    preload="metadata"
+  >
+    <source
+      src="/static/audio/infographic_audio.mp3"
+      type="audio/mpeg"
+    >
+  </audio>
+
+</div>
 <div
   class="flashcard-zoom"
   onclick="abrirInfografia()"

@@ -119,67 +119,131 @@ function mostrarResultado(){
 }
 const flashcards = [
   {
-    image: "/static/flashcards/card1.png"
+    image: "/static/flashcards/card1.png",
+    title: "Real Name & Origin",
+    text: "Born Margaretha Geertruida Zelle in Leeuwarden, Netherlands (not the East Indies)."
   },
   {
-    image: "/static/flashcards/card2.png"
+    image: "/static/flashcards/card2.png",
+    title: "The Catalyst",
+    text: " She entered the world of espionage primarily to gain travel permits and money to visit her wounded lover, the Russian pilot Vadim Maslov."
   },
   {
-    image: "/static/flashcards/card3.png"
+    image: "/static/flashcards/card3.png",
+    title: "The Double Agent Trap",
+    text: "She accepted money from both the Germans (Agent H21) and the French, but mostly provided 'old news' or gossip, making her an easy target for prosecution when the French needed a morale boost during the war."  },
+  {
+    image: "/static/flashcards/card4.png",
+    title: "Not a Javanese Princess",
+    text: "Mata Hari was not a glamorous Javanese princess but a Dutch woman who created a new identity as a dancer to survive a difficult life. However, she used the Javanese false  identity to gain acceptance or success."
+  },
+  {
+    image: "/static/flashcards/card5.png",
+    title: "Not Really a Master Spy",
+    text: "Despite her reputation, Mata Hari was not a master spy but a woman navigating limited choices during wartime. Historians continue to debate whether she was a dangerous agent or a convenient scapegoat blamed for the deaths of thousands."
   }
+  
 ];
+let typingTimer = null;
+
+function typeText(element, text, speed =100){
+
+  clearTimeout(typingTimer);
+
+  element.textContent = "";
+
+  let i = 0;
+
+  function write(){
+
+    if(i < text.length){
+
+      element.textContent += text.charAt(i);
+
+      i++;
+
+      typingTimer = setTimeout(write, speed);
+
+    }
+
+  }
+
+  write();
+}
 
 let flashcardIndex = -1;
 const quizQuestions = [
 
   {
     question: "Who was the enigmatic shadow known as Agent H21?",
+
     options: [
+      "Meta Hari",
       "Mata Hari",
-      "Marta Hari",
-      "Meta Hari"
+      "Marta Hari"
     ],
-    correct: 0
+
+    correct: 2
   },
 
   {
     question: "What was the public persona of Mata Hari during the Great War?",
+
     options: [
+      "A secret British operative",
       "A glamorous Javanese princess",
-      "A cunning French diplomat",
-      "A secret British operative"
+      "A cunning French diplomat"
     ],
-    correct: 0
+
+    correct: 1
   },
 
   {
     question: "What is the ongoing historical debate surrounding Mata Hari’s legacy?",
+
     options: [
-      "Whether she was a dangerous spy or a convenient scapegoat",
       "Whether she was a brilliant military strategist",
+      "Whether she was a dangerous spy or a convenient scapegoat",
       "Whether she was a researcher inventing communication codes"
     ],
+
     correct: 0
   },
 
   {
     question: "What surprising truth reveals the real method Mata Hari used to navigate the world?",
+
     options: [
+      "She used secret invisible ink",
       "She did not use codes or hidden messages",
-      "She was known for encrypted correspondence",
-      "She used secret invisible ink"
+      "She was known for encrypted correspondence"
     ],
-    correct: 0
+
+    correct: 1
   },
 
   {
     question: "What personal motivation drove Mata Hari to become a double agent?",
+
     options: [
-      "To reach Vadim, the Russian pilot she loved",
+      "To gain power in the espionage world",
       "To serve the interests of her country",
-      "To gain power in the espionage world"
+      "To reach Vadim, the Russian pilot she loved"
     ],
-    correct: 0
+
+    correct: 2
+  },
+
+  {
+    question: "What is the striking image of Mata Hari at the moment of her final fate, symbolizing her boldness and acceptance?",
+
+    options: [
+      "She disappeared into the shadows wearing a black veil",
+      "She faced the end in her red bodice, with her eyes wide open",
+      "She stood behind a royal curtain, disguised"
+    ],
+
+    correct: 1
   }
 
 ];
@@ -196,7 +260,7 @@ function renderQuizQuestion(){
   if(currentQuiz >= quizQuestions.length){
 
     questionEl.innerHTML = `
-      🎉 You finished the quiz!
+      You finished the quiz!
     `;
 
     optionsEl.innerHTML = `
@@ -265,41 +329,114 @@ function restartQuiz(){
   renderQuizQuestion();
 }
 
-function siguienteFlashcard() {
+function renderFlashcard(index){
+
   const front = document.getElementById('flashcard-front');
-  const back  = document.getElementById('flashcard-back');
+  const back = document.getElementById('flashcard-back');
 
-  let nextIndex = flashcardIndex + 1;
-  if (nextIndex >= flashcards.length) nextIndex = 0;
- back.innerHTML = `
-  <img 
-    src="${flashcards[nextIndex].image}"
-    class="flashcard-image"
-  >
-  <div
-    class="flashcard-zoom"
-    onclick="abrirFlashcard('${flashcards[nextIndex].image}')"
-  >
-    🔍
-  </div>
+  const card = flashcards[index];
 
-`;
+  back.innerHTML = `
+    <div class="story-flashcard">
+
+      <div class="story-image-wrap">
+        <img
+          src="${card.image}"
+          class="story-image"
+        >
+      </div>
+
+      <div class="story-text-box">
+
+        <div class="story-label">
+          Historical Fact
+        </div>
+
+        <h3>
+          ${card.title}
+        </h3>
+
+        <p class="typing-text"></p>
+
+      </div>
+
+    </div>
+  `;
 
   front.classList.add('slide-out');
 
-setTimeout(() => {
+  setTimeout(() => {
+
     front.style.transition = 'none';
-    front.style.transform = 'scale(1) translateY(0)';  
+
+    front.style.transform = 'scale(1) translateY(0)';
+
     front.innerHTML = back.innerHTML;
+
     front.classList.remove('slide-out');
 
     requestAnimationFrame(() => {
+
       front.style.transition = '';
       front.style.transform = '';
+
+      const textEl = front.querySelector(".typing-text");
+
+      typeText(textEl, card.text, 80);
+
     });
 
-    flashcardIndex = nextIndex;
+    flashcardIndex = index;
+
+    actualizarBotones();
+
   }, 420);
+}
+
+function siguienteFlashcard(){
+
+  if(flashcardIndex >= flashcards.length - 1){
+    return;
+  }
+
+  renderFlashcard(flashcardIndex + 1);
+}
+
+function anteriorFlashcard(){
+
+  if(flashcardIndex <= 0){
+    return;
+  }
+
+  renderFlashcard(flashcardIndex - 1);
+}
+function actualizarBotones(){
+
+  const btnPrev = document.getElementById("btn-prev");
+  const btnNext = document.getElementById("btn-next");
+
+  // BOTÓN ANTERIOR
+  if(flashcardIndex <= 0){
+
+  btnPrev.style.visibility = "hidden";
+  btnPrev.style.pointerEvents = "none";
+
+}else{
+
+  btnPrev.style.visibility = "visible";
+  btnPrev.style.pointerEvents = "auto";
+}
+   // BOTÓN SIGUIENTE
+if(flashcardIndex >= flashcards.length - 1){
+
+  btnNext.style.visibility = "hidden";
+  btnNext.style.pointerEvents = "none";
+
+}else{
+
+  btnNext.style.visibility = "visible";
+  btnNext.style.pointerEvents = "auto";
+}
 }
 function volverFlashcards(){
   document.getElementById('resultado-panel').style.display = 'none';
@@ -404,8 +541,10 @@ function reiniciarExperiencia(){
 
 flashcardFront.className = 'flashcard card-front';
 document.getElementById('foto-input').click();
+actualizarBotones();
 }
 flashcardsBtn.addEventListener("click", () => {
+
   flashcardsPanel.style.display = "flex";
   infographicContent.style.display = "none";
   videoContent.style.display = "none";
@@ -414,9 +553,11 @@ flashcardsBtn.addEventListener("click", () => {
   videoBtn.classList.remove("active");
   quizBtn.classList.remove("active");
   quizContent.style.display = "none";
+  actualizarBotones();
 });
 
 infographicBtn.addEventListener("click", () => {
+  
   flashcardsPanel.style.display = "none";
   document.getElementById("resultado-panel").style.display = "none";
   videoContent.style.display = "none";
@@ -441,6 +582,7 @@ videoBtn.addEventListener("click", () => {
 });
 
 quizBtn.addEventListener("click", () => {
+  
   flashcardsPanel.style.display = "none";
   infographicContent.style.display = "none";
   videoContent.style.display = "none";
