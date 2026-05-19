@@ -69,14 +69,16 @@ def procesar():
         "--face-swapper-pixel-boost", "128x128",
         "--face-swapper-weight", "0.5",
         "--execution-providers", "directml",
-        "--temp-frame-format", "png",
+        "--temp-frame-format", "jpeg",
         "--output-audio-encoder", "flac",
         "--output-audio-quality", "70",
         "--output-video-encoder", "rawvideo",
         "--output-video-preset", "ultrafast",
         "--output-video-quality", "80",
         "--output-video-scale", "1",
-        "--output-video-fps", "24",
+        "--output-video-fps", "24"
+        "--execution-thread-count", "16",
+        "--video-memory-strategy", "tolerant",,
         "--log-level", "info"
     ]
     
