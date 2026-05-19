@@ -21,6 +21,7 @@ def index():
 
 @app.route("/procesar", methods=["POST"])
 def procesar():
+
     if "foto" not in request.files:
         return jsonify({"success": False, "error": "No se recibió ninguna foto"}), 400
 
@@ -30,12 +31,31 @@ def procesar():
         return jsonify({"success": False, "error": "Archivo vacío"}), 400
 
     extension = os.path.splitext(foto.filename)[1].lower()
+
     if extension not in [".jpg", ".jpeg", ".png"]:
         return jsonify({"success": False, "error": "Solo se permiten imágenes JPG o PNG"}), 400
+
+
+    # LIMPIAR OUTPUTS VIEJOS
+    for file in os.listdir(OUTPUT_DIR):
+
+        file_path = os.path.join(OUTPUT_DIR, file)
+
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            # LIMPIAR UPLOADS
+    for file in os.listdir(UPLOAD_DIR):
+
+        file_path = os.path.join(UPLOAD_DIR, file)
+
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
 
     nombre_id   = str(uuid.uuid4())
     foto_path   = os.path.join(UPLOAD_DIR, f"{nombre_id}{extension}")
     output_path = os.path.join(OUTPUT_DIR, f"{nombre_id}.mp4")
+
     foto.save(foto_path)
 
     comando = [
@@ -47,7 +67,7 @@ def procesar():
         "--processors", "face_swapper",
         "--face-swapper-model", "hyperswap_1a_256",
         "--execution-providers", "directml",
-        "--temp-frame-format", "png",
+        "--temp-frame-format", "jpeg",
         "--log-level", "info"
 
     ]
@@ -57,7 +77,7 @@ def procesar():
             comando,
             capture_output=True,
             text=True,
-            timeout=7200,  
+            timeout=900,  
             cwd=os.path.join(BASE_DIR, "..", "facefusion") 
 
         )

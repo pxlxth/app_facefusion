@@ -165,9 +165,7 @@ function typeText(element, text, speed =100){
       typingTimer = setTimeout(write, speed);
 
     }
-
   }
-
   write();
 }
 
@@ -183,7 +181,7 @@ const quizQuestions = [
       "Marta Hari"
     ],
 
-    correct: 2
+    correct: 1
   },
 
   {
@@ -207,7 +205,7 @@ const quizQuestions = [
       "Whether she was a researcher inventing communication codes"
     ],
 
-    correct: 0
+    correct: 1
   },
 
   {
@@ -318,7 +316,7 @@ function checkAnswer(selected){
   setTimeout(() => {
     currentQuiz++;
     renderQuizQuestion();
-  }, 1200);
+  }, 600);
 }
 
 function restartQuiz(){
