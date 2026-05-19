@@ -65,19 +65,27 @@ def procesar():
         "--target-path", VIDEO_BASE,
         "--output-path", output_path,
         "--processors", "face_swapper",
-        "--face-swapper-model", "hyperswap_1a_256",
+        "--face-swapper-model", "inswapper_128",
+        "--face-swapper-pixel-boost", "128x128",
+        "--face-swapper-weight", "0.5",
         "--execution-providers", "directml",
-        "--temp-frame-format", "jpeg",
+        "--temp-frame-format", "png",
+        "--output-audio-encoder", "flac",
+        "--output-audio-quality", "70",
+        "--output-video-encoder", "rawvideo",
+        "--output-video-preset", "ultrafast",
+        "--output-video-quality", "80",
+        "--output-video-scale", "1",
+        "--output-video-fps", "24",
         "--log-level", "info"
-
     ]
-
+    
     try:
         resultado = subprocess.run(
             comando,
             capture_output=True,
             text=True,
-            timeout=900,  
+            timeout=1800,  
             cwd=os.path.join(BASE_DIR, "..", "facefusion") 
 
         )
@@ -101,4 +109,4 @@ def resultado(video_id):
     return jsonify({"error": "Video no encontrado"}), 404
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run( port=5000)

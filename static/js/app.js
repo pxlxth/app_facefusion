@@ -479,6 +479,35 @@ function abrirFlashcard(imageSrc){
 
 }
 
+function cambiarFoto(){
+
+  archivoFoto = null;
+
+  document.getElementById('foto-input').value = '';
+
+  const preview = document.getElementById('preview-img');
+
+  preview.src = '';
+  preview.style.display = 'none';
+
+  document.getElementById('upload-icon').style.display = 'block';
+  document.getElementById('upload-text').style.display = 'block';
+  document.getElementById('upload-sub').style.display = 'block';
+
+  document
+    .getElementById('upload-box')
+    .classList.remove('has-image');
+
+  document
+    .getElementById('upload-box')
+    .classList.remove('compact');
+
+  document.getElementById('btn-procesar').style.display = 'none';
+
+  document.getElementById('btn-reset-top').style.display = 'none';
+
+  document.getElementById('foto-input').click();
+} 
 function reiniciarExperiencia(){
 
   archivoFoto = null;
